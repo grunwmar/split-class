@@ -6,10 +6,8 @@ class Vector(metaclass=SplitClass):
 
     parts: ['vector.operations', 'vector.special']
 
-
     def __init__(self, *elements):
         self._elements = elements
-
 
     @property
     def tuple(self):

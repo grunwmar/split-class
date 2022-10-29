@@ -15,8 +15,7 @@ class MyClass:
 Usage of decorator @splitclass will search for directory `./@MyClass` and tries to import files contained in it as python modules in which searches for classes named `MyClass`
 having attribute `__partial__ = True`. Then updates `__dict__` of such partial class to its original `__dict__` and creates 'itself' de novo using `type()` constructor.
 
-## `./@MyClass/some_filename.py`
-
+**`./@MyClass/some_filename.py`**
 ```python
 from splitclass import partialclass
 

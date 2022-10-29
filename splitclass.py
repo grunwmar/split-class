@@ -6,6 +6,7 @@ import types
 
 def _raise_cannot_instantiate(*args):
     raise TypeError(f"Creating an instance of {args[0]} is not permitted.")
+    ...
 
 
 def partialclass(cls):
@@ -13,7 +14,7 @@ def partialclass(cls):
 
     def inner():
         cls.__partial__ = True
-        setattr(cls, '__init__', _raise_cannot_instantiate)
+        setattr(cls, '__call__', _raise_cannot_instantiate)
         return cls
     return inner()
 

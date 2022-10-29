@@ -1,23 +1,40 @@
 """ Class which allow to split its content into multiple files. """
-
+import os
 import importlib
 import types
 
 
-class PartialClass:
-    """ Rises TypeError in case of atempt to instantiate it."""
-
-    def __init__(mcs, *args, **kwargs):
-        raise TypeError('PartialClass cannot be instantiated.')
+def _raise_cannot_instantiate(*args):
+    raise TypeError(f"Creating an instance of {args[0]} is not permitted.")
 
 
-class SplitClass(type):
-    """ Metaclass allowing to split child class to multiple files """
+def partialclass(cls):
+    """ Marks class as partial """
 
-    def __call__(mcs, *args, **kwargs):
+    def inner():
+        cls.__partial__ = True
+        setattr(cls, '__init__', _raise_cannot_instantiate)
+        return cls
+    return inner()
+
+
+def splitclass(csl):
+    """ Decorator allowing to split child class to multiple files """
+
+    def inner():
+
+        dir_name = f"@{csl.__name__}"
+
+        if not os.path.isdir(dir_name):
+            os.mkdir(dir_name)
+
+        partial_classes = []
 
         # reads modules containing SplitClass parts
-        partial_classes = mcs.__annotations__['parts']
+        for entry in os.listdir(dir_name):
+            if os.path.isfile(os.path.join(dir_name, entry)):
+                entry, _ = os.path.splitext(entry)
+                partial_classes += [f"{dir_name}.{entry}"]
 
         new_attributes = {}
 
@@ -25,23 +42,24 @@ class SplitClass(type):
 
             # loading found classes parts
             part_module = importlib.import_module(f'{part}')
-            part_class = part_module.__dict__[mcs.__name__]
+            part_class = part_module.__dict__[csl.__name__]
 
-            # raise TypeError if found class does not inherits from SplitClass
-            if not PartialClass in part_class.__bases__:
-                raise TypeError(f'Class {part}.{part_class.__name__} does not inherits from PartialClass.')
+            if not part_class.__partial__ == True:
+                raise TypeError(f"Class {part_class} is not a partial class.")
 
             # collected new attributes from valid partial classes
             for k, v in part_class.__dict__.items():
+                if k in ["__partial__"]:
+                    continue
                 new_attributes[k] = v
-
 
         # updates collected attributes to original attributes
         original_attributes = new_attributes
-        original_attributes.update(mcs.__dict__)
+        original_attributes.update(csl.__dict__)
 
         # creates new class with all collected attributes merged to attributes
         # of original class
-        new_class = type(mcs.__name__, mcs.__bases__, original_attributes)(*args, **kwargs)
+        new_class = type(csl.__name__, csl.__bases__, original_attributes)
 
         return new_class
+    return inner()

@@ -1,10 +1,9 @@
-from splitclass import SplitClass
+from splitclass import splitclass
 
 
-class Vector(metaclass=SplitClass):
+@splitclass
+class Vector:
     """ Class representing arithmetic vector """
-
-    parts: ['vector.operations', 'vector.special']
 
     def __init__(self, *elements):
         self._elements = elements

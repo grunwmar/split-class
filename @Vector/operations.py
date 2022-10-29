@@ -1,7 +1,8 @@
-from splitclass import PartialClass
+from splitclass import partialclass
 
 
-class Vector(PartialClass):
+@partialclass
+class Vector():
     """ Part of Vector class containing definitions of basic vecor operations """
 
     def __add__(self, other):

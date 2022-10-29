@@ -1,8 +1,8 @@
+from splitclass import partialclass
 import math
-from splitclass import PartialClass
 
-
-class Vector(PartialClass):
+@partialclass
+class Vector():
     """ Part of Vector class containing definitions """
     """ of more advanced vector operations """
 

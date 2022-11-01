@@ -5,11 +5,9 @@ sys.path.append('../../split-class')
 from splitclass import splitclass
 
 
-@splitclass
+@splitclass(partials=["Vector.operations", "Vector.special"])
 class Vector:
     """ Class representing arithmetic vector """
-
-    partials: ["Vector.operations", "Vector.special"]
 
     def __init__(self, *elements):
         self._elements = elements

@@ -29,15 +29,14 @@ def partialclass(cls):
     return new_class
 
 
-def splitclass(cls):
+def splitclass(partials):
     """ Decorator allowing to split child class to multiple files """
 
-    new_attributes = {}
+    def inner(cls):
 
-    if (hasattr(cls, '__annotations__') and
-                        cls.__annotations__.get('partials') is not None):
+        new_attributes = {}
 
-        for part in cls.__annotations__.get('partials'):
+        for part in partials:
 
             # loading found classes parts
             part_module = importlib.import_module(f"{part}")
@@ -52,12 +51,14 @@ def splitclass(cls):
                     continue
                 new_attributes[k] = v
 
-    # updates collected attributes to original attributes
-    original_attributes = new_attributes
-    original_attributes.update(cls.__dict__)
+        # updates collected attributes to original attributes
+        original_attributes = new_attributes
+        original_attributes.update(cls.__dict__)
 
-    # creates new class with all collected attributes merged to attributes
-    # of original class
-    new_class = type(cls.__name__, cls.__bases__, original_attributes)
+        # creates new class with all collected attributes merged to attributes
+        # of original class
+        new_class = type(cls.__name__, cls.__bases__, original_attributes)
 
-    return new_class
+        return new_class
+
+    return inner

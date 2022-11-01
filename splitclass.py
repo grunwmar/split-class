@@ -12,38 +12,36 @@ def _raise_cannot_instantiate(*args):
 def partialclass(cls):
     """ Marks class as partial """
 
-    def inner():
-        cls.__partial__ = True
-        setattr(cls, '__call__', _raise_cannot_instantiate)
-        return cls
-    return inner()
+    new_attrs = dict(cls.__dict__)
+    new_attrs.update(
+        {
+            "__partial__": True,
+            "__call__": _raise_cannot_instantiate
+        }
+    )
+
+    new_class = type(
+                    cls.__name__,
+                    cls.__bases__,
+                    new_attrs
+                )
+
+    return new_class
 
 
-def splitclass(csl):
+def splitclass(cls):
     """ Decorator allowing to split child class to multiple files """
 
-    def inner():
+    new_attributes = {}
 
-        dir_name = f"@{csl.__name__}"
+    if (hasattr(cls, '__annotations__') and
+                        cls.__annotations__.get('partials') is not None):
 
-        if not os.path.isdir(dir_name):
-            os.mkdir(dir_name)
-
-        partial_classes = []
-
-        # reads modules containing SplitClass parts
-        for entry in os.listdir(dir_name):
-            if os.path.isfile(os.path.join(dir_name, entry)):
-                entry, _ = os.path.splitext(entry)
-                partial_classes += [f"{dir_name}.{entry}"]
-
-        new_attributes = {}
-
-        for part in partial_classes:
+        for part in cls.__annotations__.get('partials'):
 
             # loading found classes parts
-            part_module = importlib.import_module(f'{part}')
-            part_class = part_module.__dict__[csl.__name__]
+            part_module = importlib.import_module(f"{part}")
+            part_class = part_module.__dict__[cls.__name__]
 
             if not part_class.__partial__ == True:
                 raise TypeError(f"Class {part_class} is not a partial class.")
@@ -54,13 +52,12 @@ def splitclass(csl):
                     continue
                 new_attributes[k] = v
 
-        # updates collected attributes to original attributes
-        original_attributes = new_attributes
-        original_attributes.update(csl.__dict__)
+    # updates collected attributes to original attributes
+    original_attributes = new_attributes
+    original_attributes.update(cls.__dict__)
 
-        # creates new class with all collected attributes merged to attributes
-        # of original class
-        new_class = type(csl.__name__, csl.__bases__, original_attributes)
+    # creates new class with all collected attributes merged to attributes
+    # of original class
+    new_class = type(cls.__name__, cls.__bases__, original_attributes)
 
-        return new_class
-    return inner()
+    return new_class

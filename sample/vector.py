@@ -9,6 +9,8 @@ from splitclass import splitclass
 class Vector:
     """ Class representing arithmetic vector """
 
+    partials: ["Vector.operations", "Vector.special"]
+
     def __init__(self, *elements):
         self._elements = elements
 

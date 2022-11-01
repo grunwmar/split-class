@@ -18,7 +18,7 @@ def test_split_decorator_class_name():
     """ TEST 2 - Testing function of @splitclass decorator if class name is """
     """ exchanged properly """
 
-    @splitclass
+    @splitclass(partials=["AnyObject.anyobject_constants", "AnyObject.anyobject_methods"])
     class AnyObject:
         ...
 
@@ -31,7 +31,7 @@ def test_split_decorator_bases():
 
     TestClass = type('TestClass', (), {})
 
-    @splitclass
+    @splitclass(partials=["AnyObject.anyobject_constants", "AnyObject.anyobject_methods"])
     class AnyObject(TestClass):
         ...
 
@@ -42,7 +42,7 @@ def test_split_decorator_attributes():
     """ TEST 4 - Testing function of @splitclass decorator is loading @partialclass """
     """ marked classses properly """
 
-    @splitclass
+    @splitclass(partials=["AnyObject.anyobject_constants", "AnyObject.anyobject_methods"])
     class AnyObject:
 
         def __init__(self, name):

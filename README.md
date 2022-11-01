@@ -12,7 +12,7 @@ class MyClass:
   ...
 
 ```
-Use of decorator @splitclass will import modules in its parameter `partials=[...]` and check if has class with the same name and if that class has attribute `__partial__ = True`. Then updates `__dict__` of such partial class to its original `__dict__` and creates 'itself' de novo using `type()` constructor.
+Use of decorator `@splitclass` will import modules in its parameter `partials=[...]` and check if has class with the same name and if that class has attribute `__partial__ = True`. Then updates `__dict__` of such partial class to its original `__dict__` and creates 'itself' de novo using `type()` constructor.
 
 ### `./@MyClass/some_filename.py`
 ```python
